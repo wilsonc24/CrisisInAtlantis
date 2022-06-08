@@ -1,4 +1,3 @@
--Press Enter To Start Game-
 Hello voyager! I see that you have come to visit our famed city of Atlantis.
 Hmm? What am I? I am NOVA... an orb.
 Anyway we are in dire straits! You need to save Atlantis!
@@ -20,6 +19,7 @@ On the other hand, non point source pollution accounts for three times as much!
 oil in the ocean
 trash in the ocean
 ocean noise
+
 
 
 
