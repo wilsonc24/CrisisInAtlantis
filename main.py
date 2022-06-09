@@ -23,7 +23,7 @@ RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 SAND = (194, 178, 128)
 GREEN = (0, 255, 0)
-PINK = (255,20,147)
+PINK = (255, 20, 147)
 FPS = 60
 SIZE = 75
 
@@ -68,6 +68,8 @@ BOSS_FRAME_0 = pygame.transform.scale(BOSS_FRAME_0, (BOSS_WIDTH, BOSS_HEIGHT))
 BOSS_FRAME_1 = pygame.transform.scale(BOSS_FRAME_1, (BOSS_WIDTH, BOSS_HEIGHT))
 BOSS_FRAME_2 = pygame.transform.scale(BOSS_FRAME_2, (BOSS_WIDTH, BOSS_HEIGHT))
 BOSS_FRAME_3 = pygame.transform.scale(BOSS_FRAME_3, (BOSS_WIDTH, BOSS_HEIGHT))
+BOSS_FRAME_DMG = pygame.image.load('./assets/boss2Damage.png')
+BOSS_FRAME_DMG = pygame.transform.scale(BOSS_FRAME_DMG, (BOSS_WIDTH, BOSS_HEIGHT))
 
 CAVE2 = pygame.image.load('./assets/cave2.png')
 CAVE2 = pygame.transform.scale(CAVE2, (WIDTH, HEIGHT))
@@ -76,12 +78,16 @@ DRAGONFIRE = pygame.mixer.Sound('./assets/dragonfire.mp3')
 TRASH = pygame.image.load('./assets/garbage.png')
 TRASH = pygame.transform.scale(TRASH, (TRASH.get_width() / 5, TRASH.get_height() / 5))
 
+MISSILE = pygame.image.load('./assets/missile1.png')
+#MISSILE = pygame.transform.scale(MISSILE, (MISSILE.get_width() * 5, MISSILE.get_height() * 5))
+
 global text
 global line_numi
 line_num = 0
 text_list = []
 
 PLAYER_HIT = pygame.USEREVENT + 5
+
 
 def print_text():
     global text_len
@@ -190,7 +196,6 @@ def intro():
                     elif quit_button.collidepoint(pos):
                         pygame.quit()
                         sys.exit()
-        WIN.blit(TRASH, (0, 0))
         pygame.display.update()
 
 
@@ -218,17 +223,16 @@ def oil_dropping(drop):
 
 
 
-BULLET_VEL = 10
+BULLET_VEL = 20
 
 def fight():
     player_health = 5
     vel = 5
-    max_drops = 5
     oil_drops = []
     trash_list = []
-    BULLET_VEL = 10
     color = ""
     max_bullets = 999999
+    max_missiles = 100
     frames = [BOSS_FRAME_0, BOSS_FRAME_1, BOSS_FRAME_2, BOSS_FRAME_3]
     GAME_SONG.stop()
     BOSS_SONG.set_volume(0.3)
@@ -238,6 +242,7 @@ def fight():
     i = 0
     piece = pygame.Rect(400, 300, BOSS_WIDTH, BOSS_HEIGHT)
     bullets = []
+    missiles = []
     while active:
         clock.tick(FPS)
         if i == 4:
@@ -245,8 +250,10 @@ def fight():
         boss = frames[i]
         WIN.blit(SEA, (0, 0))
         WIN.blit(WORD_FONT.render("Ammo : " + str(max_bullets), True, GREEN), (0, 0))
-        WIN.blit(WORD_FONT.render("Health : " + str(player_health), True, RED), (0, 30))
-        WIN.blit(boss, (piece.x, piece.y))
+        WIN.blit(WORD_FONT.render("Missiles : " + str(max_missiles), True, PINK), (0, 30))
+        WIN.blit(WORD_FONT.render("Health : " + str(player_health), True, RED), (0, 60))
+
+
         keys_pressed = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -255,18 +262,18 @@ def fight():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     active = False
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                bullet = pygame.Rect(piece.x + piece.width // 2 - 2, piece.y - 7, 5, 10)
-                color = PINK
-                bullets.append(bullet)
-                max_bullets -= 1
+                if event.key == pygame.K_p:
+                    pause()
+            if event.type == pygame.MOUSEBUTTONDOWN and max_missiles > 0:
+                missile = pygame.Rect(piece.x + piece.width // 2 - MISSILE.get_width() // 2, piece.y - MISSILE.get_height() + 25, MISSILE.get_width(), MISSILE.get_height())
+                #missile = pygame.Rect(0 , piece.y - MISSILE.get_height() + 25, WIDTH, MISSILE.get_height())
+                missiles.append(missile)
+                max_missiles -= 1
             if event.type == PLAYER_HIT:
+                boss = BOSS_FRAME_DMG
                 player_health -= 1
-                #BULLET_HIT_SOUND.play()
-
-
-        if keys_pressed[pygame.K_SPACE]:
+                # BULLET_HIT_SOUND.play()
+        if keys_pressed[pygame.K_SPACE] and max_bullets > 0:
             bullet = pygame.Rect(piece.x + piece.width // 2 - 4, piece.y - 5, 10, 3)
             color = PINK
             bullets.append(bullet)
@@ -276,41 +283,39 @@ def fight():
             bullets.append(bullet2)
             max_bullets -= 3
         if keys_pressed[pygame.K_LSHIFT]:
-            vel = 10
+            vel = 20
         if keys_pressed[pygame.K_LSHIFT] is False:
-            vel = 5
-
+            vel = 10
 
         chance = random.randint(0, 20)
         if chance == 5:
             x_pos = random.randint(0, 900)
-            drop = pygame.Rect(x_pos, 0, 10, 10)
+            drop = pygame.Rect(x_pos, 0, OIL.get_width(), OIL.get_height())
             oil_drops.append(drop)
 
         if chance == 6:
             x_pos = random.randint(0, 900)
-            trash = pygame.Rect(x_pos, 0, 10, 10)
+            trash = pygame.Rect(x_pos, 0, TRASH.get_width(), TRASH.get_height())
             trash_list.append(trash)
 
-
-        #handle_obstacles(oil_drops, piece)
-        #handle_bullets(bullets)
-        handle_everything(bullets, oil_drops, trash_list, piece)
-
-
+        # handle_obstacles(oil_drops, piece)
+        # handle_bullets(bullets)
+        handle_everything(bullets, missiles, oil_drops, trash_list, piece)
 
         handle_movement(keys_pressed, piece, vel)
         for bullet in bullets:
             pygame.draw.rect(WIN, GREEN, bullet)
+        for missile in missiles:
+            WIN.blit(MISSILE, (missile.x, missile.y))
+            #pygame.draw.rect(WIN, PINK, missile)
         for drop in oil_drops:
-            #pygame.draw.rect(WIN, BLACK, drop)
+            # pygame.draw.rect(WIN, BLACK, drop)
             WIN.blit(OIL, (drop.x, drop.y))
         for trash in trash_list:
-        #pygame.draw.rect(WIN, BLACK, drop)
+            # pygame.draw.rect(WIN, BLACK, drop)
             WIN.blit(TRASH, (trash.x, trash.y))
 
-
-
+        WIN.blit(boss, (piece.x, piece.y))
         pygame.display.update()
         i += 1
 
@@ -327,6 +332,7 @@ def handle_obstacles(oil_drops, piece):
         elif drop.colliderect(piece):
             pygame.event.post(pygame.event.Event(PLAYER_HIT))
             oil_drops.remove(drop)
+
 
 def handle_trash(trash_list, piece):
     for drop in trash_list:
@@ -347,19 +353,27 @@ def handle_bullets(bullets):
         if bullet.x < 0:
             bullets.remove(bullet)
 
-def handle_everything(bullets, oil_drops, trash_list, piece):
+
+def handle_everything(bullets, missiles, oil_drops, trash_list, piece):
     for bullet in bullets:
         bullet.y -= BULLET_VEL
         for trash in trash_list:
             if trash.colliderect(bullet):
                 trash_list.remove(trash)
                 bullets.remove(bullet)
-
-    # if red.colliderect(bullet):
-    # pygame.event.post(pygame.event.Event(RED_HIT))
-    # yellow_bullets.remove(bullet)
         if bullet.x < 0:
             bullets.remove(bullet)
+
+
+    for missile in missiles:
+        missile.y -= 15
+        for trash in trash_list:
+            if trash.colliderect(missile):
+                trash_list.remove(trash)
+        for oil in oil_drops:
+            if oil.colliderect(missile):
+                oil_drops.remove(oil)
+
 
     for drop in oil_drops:
         drop.y += 5
@@ -368,9 +382,9 @@ def handle_everything(bullets, oil_drops, trash_list, piece):
         elif drop.colliderect(piece):
             pygame.event.post(pygame.event.Event(PLAYER_HIT))
             oil_drops.remove(drop)
-        #for bullet in bullets:
-           # if bullet.colliderect(drop):
-              #  oil_drops.remove(drop)
+        for bullet in bullets:
+            if bullet.colliderect(drop):
+                bullets.remove(bullet)
 
     for trash in trash_list:
         trash.y += 5
@@ -379,11 +393,6 @@ def handle_everything(bullets, oil_drops, trash_list, piece):
         elif trash.colliderect(piece):
             pygame.event.post(pygame.event.Event(PLAYER_HIT))
             trash_list.remove(trash)
-
-
-
-
-
 
 
 def handle_movement(keys_pressed, piece, vel):
@@ -396,6 +405,18 @@ def handle_movement(keys_pressed, piece, vel):
     if keys_pressed[pygame.K_s] and piece.y + vel + piece.height < HEIGHT:  # DOWN
         piece.y += vel
 
+def pause():
+    paused = True
+    BOSS_SONG.set_volume(0)
+    while paused:
+        WIN.blit(ORB, (300,300))
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    paused = False
+        pygame.display.update()
+    BOSS_SONG.set_volume(0.3)
+    return
 
 def main():
     intro()
