@@ -73,6 +73,8 @@ CAVE2 = pygame.image.load('./assets/cave2.png')
 CAVE2 = pygame.transform.scale(CAVE2, (WIDTH, HEIGHT))
 
 DRAGONFIRE = pygame.mixer.Sound('./assets/dragonfire.mp3')
+TRASH = pygame.image.load('./assets/garbage.png')
+TRASH = pygame.transform.scale(TRASH, (TRASH.get_width() / 5, TRASH.get_height() / 5))
 
 global text
 global line_numi
@@ -151,7 +153,7 @@ def intro():
         pos = pygame.mouse.get_pos()
         WIN.blit(OCEAN, (0, 0))
         WIN.blit(TITLE, (WIDTH / 2 - TITLE.get_width() / 2, 70))
-        # WIN.blit(SPARK, (0,0))
+        WIN.blit(SPARK, (0, 0))
 
         WIN.blit(BUTTON, (WIDTH / 2 - BUTTON.get_width() / 2, 250))  # singleplayer
         WIN.blit(BUTTON, (WIDTH / 2 - BUTTON.get_width() / 2, 320))  # quit
@@ -188,7 +190,7 @@ def intro():
                     elif quit_button.collidepoint(pos):
                         pygame.quit()
                         sys.exit()
-        WIN.blit(SPARK, (0, 0))
+        WIN.blit(TRASH, (0, 0))
         pygame.display.update()
 
 
@@ -223,6 +225,7 @@ def fight():
     vel = 5
     max_drops = 5
     oil_drops = []
+    trash_list = []
     BULLET_VEL = 10
     color = ""
     max_bullets = 999999
@@ -280,15 +283,19 @@ def fight():
 
         chance = random.randint(0, 20)
         if chance == 5:
-        #if keys_pressed[pygame.K_y]:
             x_pos = random.randint(0, 900)
             drop = pygame.Rect(x_pos, 0, 10, 10)
             oil_drops.append(drop)
 
+        if chance == 6:
+            x_pos = random.randint(0, 900)
+            trash = pygame.Rect(x_pos, 0, 10, 10)
+            trash_list.append(trash)
+
 
         #handle_obstacles(oil_drops, piece)
         #handle_bullets(bullets)
-        handle_everything(bullets, oil_drops, piece)
+        handle_everything(bullets, oil_drops, trash_list, piece)
 
 
 
@@ -298,6 +305,9 @@ def fight():
         for drop in oil_drops:
             #pygame.draw.rect(WIN, BLACK, drop)
             WIN.blit(OIL, (drop.x, drop.y))
+        for trash in trash_list:
+        #pygame.draw.rect(WIN, BLACK, drop)
+            WIN.blit(TRASH, (trash.x, trash.y))
 
 
 
@@ -337,12 +347,12 @@ def handle_bullets(bullets):
         if bullet.x < 0:
             bullets.remove(bullet)
 
-def handle_everything(bullets, oil_drops, piece):
+def handle_everything(bullets, oil_drops, trash_list, piece):
     for bullet in bullets:
         bullet.y -= BULLET_VEL
-        for drop in oil_drops:
-            if drop.colliderect(bullet):
-                oil_drops.remove(drop)
+        for trash in trash_list:
+            if trash.colliderect(bullet):
+                trash_list.remove(trash)
                 bullets.remove(bullet)
 
     # if red.colliderect(bullet):
@@ -362,7 +372,13 @@ def handle_everything(bullets, oil_drops, piece):
            # if bullet.colliderect(drop):
               #  oil_drops.remove(drop)
 
-
+    for trash in trash_list:
+        trash.y += 5
+        if trash.y > HEIGHT:
+            trash_list.remove(trash)
+        elif trash.colliderect(piece):
+            pygame.event.post(pygame.event.Event(PLAYER_HIT))
+            trash_list.remove(trash)
 
 
 
@@ -390,7 +406,7 @@ def main():
     run = True
     update_text()
     GAME_SONG.set_volume(0.3)
-    DRAGONFIRE.play(-1)
+    GAME_SONG.play(-1)
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
