@@ -11,20 +11,14 @@ Point source pollution occurs from a source that can be identified, like an oil 
 However, non point source pollution occurs due to runoff, and end up in our oceans via our roads, rivers and drainpipes.
 Point source pollution such as oil spills only account for about 12% of our ocean's oil pollution.
 On the other hand, non point source pollution accounts for three times as much!
-!oilevent
-
-
-
+Even now trash and oil is constantly spilling into the ocean.
+Your mission to is defend Atlantis by destorying as much of that gunk as possible!
+Shall we get started?
+!fight_event
 
 oil in the ocean
 trash in the ocean
 ocean noise
-
-
-
-
-
-
 
 
 
