@@ -417,9 +417,6 @@ def fight():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    active = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1 and pause_icon_piece.collidepoint(pos):
                     pause_game()
