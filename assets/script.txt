@@ -1,26 +1,21 @@
-Hello voyager! I see that you have come to visit our famed city of Atlantis.
+Hello Voyager! I see that you have come to visit our famed city of Atlantis.
 Hmm? What am I? I am NOVA... an orb.
+(The Nanotechnological Oxygen Vital Accelerator responsible for the oxygen dome that surrounds Atlantis)
 Anyway we are in dire straits! You need to save Atlantis!
-On-landers have polluted the oceans so much Atlantis may just be buried and forever lost...
-Did you know that every year, billions of pounds of trash and other pollutants enter the ocean?
-80% of marine pollution comes from on-landers!
-But now that you are here to help I'm a lot more reassured!
-First thing I want you to help is with all the oil oozing into our ocean.
-Now, there are two types of oil pollution, non point source and point source.
-Point source pollution occurs from a source that can be identified, like an oil spill.
-However, non point source pollution occurs due to runoff, and end up in our oceans via our roads, rivers and drainpipes.
+The oceans are polluted to the point Atlantis may just be buried and forever lost...
+But now that you are here to help I'm a lot more reassured.
+Because there has been a massive oil spill, we currently cannot defend against all the pollutants headed our way.
+Defend Atlantis by destroying as much of that junk as possible!
+You will be equipped with a laser gun [SPACE TO FIRE] that destroys any trash on impact, but it won't work on oil.
+To blast away oil, you will need to utilize special laser missiles [CLICK TO FIRE], obtained from missile crates.
+To get a speed boost, [HOLD SHIFT].
+To heal, pick up dropping hearts.
+Demolishing trash gives +1 points
+Disintegrating oil grants +10 points
+Let's get started!
+!fight_event
+About all the oil oozing into our ocean...
+There are two types of oil pollution, non point source and point source.
+Point source pollution occurs from identifiable sources, like an oil spill.
 Point source pollution such as oil spills only account for about 12% of our ocean's oil pollution.
 On the other hand, non point source pollution accounts for three times as much!
-Even now trash and oil is constantly spilling into the ocean.
-Your mission to is defend Atlantis by destorying as much of that gunk as possible!
-Shall we get started?
-!fight_event
-
-oil in the ocean
-trash in the ocean
-ocean noise
-
-
-
-
-

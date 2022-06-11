@@ -2,7 +2,6 @@ import pygame
 import time
 import sys
 import random
-from pygame import mixer
 
 pygame.init()
 pygame.font.init()
@@ -14,6 +13,7 @@ pygame.display.set_caption("CRISIS IN ATLANTIS")
 programIcon = pygame.image.load('./assets/orb2.png')
 pygame.display.set_icon(programIcon)
 WORD_FONT = pygame.font.SysFont('garamond', 30)
+NAME_FONT = pygame.font.SysFont('garamond', 40)
 SCORE_FONT = pygame.font.SysFont('Verdana', 40)
 FINAL_SCORE_FONT = pygame.font.SysFont('Verdana', 60)
 WIN_FONT = pygame.font.SysFont('garamond', 70)
@@ -30,7 +30,9 @@ MARINE = (50, 100, 83)
 PURPLE = (102, 51, 153)
 FPS = 60
 SIZE = 75
+BULLET_VEL = 15
 
+# ASSETS
 SUSPENSE = pygame.mixer.Sound('./assets/suspense.ogg')
 MYSTERY = pygame.mixer.Sound('./assets/mystery.mp3')
 SEA = pygame.image.load('./assets/sea.jpg')
@@ -45,15 +47,11 @@ UNPAUSED_BLUE = pygame.image.load('./assets/UNPAUSE_blue.png')
 UNPAUSED_WHITE = pygame.image.load('./assets/UNPAUSE_white.png')
 SCORE_IMG = pygame.image.load('./assets/SCORE.png')
 HIGHSCORE_IMG = pygame.image.load('./assets/HIGHSCORE.png')
-
 OIL = pygame.image.load('./assets/oil.png')
 OIL = pygame.transform.scale(OIL, (OIL.get_width() / 15, OIL.get_height() / 15))
 OCEAN = pygame.image.load('./assets/ocean.jpg')
-
-
 INTRO_SONG = MYSTERY
 GAME_SONG = SUSPENSE
-
 BUTTON = pygame.image.load('./assets/button.png')
 BUTTON = pygame.transform.scale(BUTTON, (400, 50))
 WHITE_BUTTON = pygame.image.load('./assets/whitebutton.png')
@@ -61,22 +59,15 @@ WHITE_BUTTON = pygame.transform.scale(WHITE_BUTTON, (400, 50))
 SMALLER_BUTTON = pygame.transform.scale(BUTTON, (190, 50))
 SMALLER_WHITE_BUTTON = pygame.transform.scale(WHITE_BUTTON, (190, 50))
 GAME_OVER = pygame.image.load('./assets/GAME-OVER.png')
-
 REPLAY_ICON = pygame.image.load('./assets/rep.png')
 HOME_ICON = pygame.image.load('./assets/home.png')
-
 PAUSE_BLUE = pygame.image.load('./assets/pause.png')
 PAUSE_YELLOW = pygame.image.load('./assets/pause2.png')
-
-
-
+CLICK_SOUND = pygame.mixer.Sound('./assets/button_click_sound.wav')
 WHITE_REPLAY_ICON = pygame.image.load('./assets/rep_white.png')
 WHITE_HOME_ICON = pygame.image.load('./assets/home_white.png')
-
-
 LARGER_BUTTON = pygame.transform.scale(WHITE_BUTTON, (420, 50))
 TITLE = pygame.image.load('./assets/title.png')
-
 BOSS_SONG = pygame.mixer.Sound('./assets/boss.wav')
 LASER_SOUND = pygame.mixer.Sound('./assets/laser_sound.wav')
 LASER_SOUND.set_volume(0.2)
@@ -85,8 +76,7 @@ HEAL_SOUND.set_volume(0.4)
 RELOAD_SOUND = pygame.mixer.Sound('./assets/reload.wav')
 RELOAD_SOUND.set_volume(0.3)
 HIT_SOUND = pygame.mixer.Sound('./assets/hit_sound.wav')
-HIT_SOUND.set_volume(0.7)
-
+HIT_SOUND.set_volume(0.5)
 BOSS_FRAME_0 = pygame.image.load('./assets/boss2frame0.png')
 BOSS_FRAME_1 = pygame.image.load('./assets/boss2frame1.png')
 BOSS_FRAME_2 = pygame.image.load('./assets/boss2frame2.png')
@@ -101,26 +91,27 @@ BOSS_FRAME_DMG = pygame.image.load('./assets/boss2Damage.png')
 BOSS_FRAME_DMG = pygame.transform.scale(BOSS_FRAME_DMG, (BOSS_WIDTH, BOSS_HEIGHT))
 HEART = pygame.image.load('./assets/heart_2.gif')
 HEART = pygame.transform.scale(HEART, (HEART.get_width() * 2, HEART.get_height() * 2))
-
-
-DRAGONFIRE = pygame.mixer.Sound('./assets/dragonfire.mp3')
 TRASH = pygame.image.load('./assets/garbage.png')
 TRASH = pygame.transform.scale(TRASH, (TRASH.get_width() / 5, TRASH.get_height() / 5))
-
 MISSILE = pygame.image.load('./assets/missile1.png')
-#MISSILE = pygame.transform.scale(MISSILE, (MISSILE.get_width() * 5, MISSILE.get_height() * 5))
 MISSILE_ICON = pygame.image.load('./assets/missileicon.png')
 GAME_OVER_SONG = pygame.mixer.Sound('./assets/gameoveraudio.mp3')
 MISSILE_CRATE = pygame.image.load('./assets/missilecrate.png')
 MISSILE_CRATE = pygame.transform.scale(MISSILE_CRATE, (MISSILE_CRATE.get_width() / 4, MISSILE_CRATE.get_height() / 4))
+PICTURE_FRAME = pygame.image.load('./assets/picture_frame.png')
+
 
 global text
-global line_numi
-line_num = 0
-text_list = []
+global line_num
+global text_len
 global high_score
+text_list = []
+line_num = 0
 high_score = 0
+text_len = 0
 
+
+# EVENTS
 BOX = pygame.USEREVENT + 1
 OIL_EVENT = pygame.USEREVENT + 2
 pygame.time.set_timer(BOX, 500)
@@ -133,7 +124,6 @@ UNPAUSING = pygame.USEREVENT + 9
 
 def print_text():
     global text_len
-    # TYPE.play()
     space = 580
     for text in text_list:
         text_len += 1
@@ -156,22 +146,22 @@ def update_text():
             pygame.event.post(pygame.event.Event(UNPAUSING))
             fight()
         texts = t.split(" ")
-        n = 1
+        #n = 1
         for i in texts:
             sen += i + " "
-            if n % 10 == 0:
+            l = WORD_FONT.render(sen, True, WHITE)
+            if l.get_width() >= 700:
                 text_list.append(sen)
                 sen = ""
-                n = 1
-            n += 1
+            #if n % 10 == 0:
+              #  text_list.append(sen)
+               # sen = ""
+               # n = 1
+            #n += 1
         text_list.append(sen)
         line_num += 1
     except IndexError:
         pass
-
-
-global text_len
-text_len = 0
 
 
 def game_over(score):
@@ -190,12 +180,10 @@ def game_over(score):
         replay_icon = REPLAY_ICON
         home_icon = HOME_ICON
 
-
         if replay_icon_piece.collidepoint(pos):
             replay_icon = WHITE_REPLAY_ICON
         elif home_icon_piece.collidepoint(pos):
             home_icon = WHITE_HOME_ICON
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -213,20 +201,27 @@ def game_over(score):
         WIN.blit(OCEAN, (-900, 0))
         WIN.blit(GAME_OVER, (WIDTH/ 2 - GAME_OVER.get_width()/2, 80))
         WIN.blit(HIGHSCORE_IMG, (WIDTH/ 2 - HIGHSCORE_IMG.get_width()/2, 150 + HIGHSCORE_IMG.get_height()))
-        WIN.blit(high_score_text, (WIDTH/ 2 - high_score_text.get_width()/2, 150 + HIGHSCORE_IMG.get_height() + HIGHSCORE_IMG.get_height()))
-        WIN.blit(SCORE_IMG, (WIDTH/ 2 - SCORE_IMG.get_width()/2, 150 + HIGHSCORE_IMG.get_height() + HIGHSCORE_IMG.get_height() + high_score_text.get_height()))
-        WIN.blit(score_points, (WIDTH/ 2 - score_points.get_width()/2, 150 + HIGHSCORE_IMG.get_height() + HIGHSCORE_IMG.get_height() + high_score_text.get_height() + SCORE_IMG.get_height()))
+        WIN.blit(high_score_text, (WIDTH/ 2 - high_score_text.get_width()/2, 150 + HIGHSCORE_IMG.get_height() +
+                                   HIGHSCORE_IMG.get_height()))
+        WIN.blit(SCORE_IMG, (WIDTH/ 2 - SCORE_IMG.get_width()/2, 150 + HIGHSCORE_IMG.get_height() +
+                             HIGHSCORE_IMG.get_height() + high_score_text.get_height()))
+        WIN.blit(score_points, (WIDTH/ 2 - score_points.get_width()/2, 150 + HIGHSCORE_IMG.get_height() +
+                                HIGHSCORE_IMG.get_height() + high_score_text.get_height() + SCORE_IMG.get_height()))
         WIN.blit(home_icon, (420, 560))
         WIN.blit(replay_icon, (540, 565))
         pygame.display.update()
+
 
 def controls():
     active = True
     home_icon_piece = pygame.Rect(0, 0, HOME_ICON.get_width(), HOME_ICON.get_height())
 
-    controls_text_string = ["-CONTROLS-", " ", "[WASD] to move", "[SPACE] to fire laser gun", "(hold to spam fire, can't destory oil)","[CLICK] to fire laser missile",
-                            "(blasts away everything)", "(limited ammo, obtained from missile crates)", "[HOLD SHIFT] for speed boost", " ", "-Destorying junk gives +1 score-",
-                            "-Blasting away oil gives +10 score-", "(Only laser missiles can blast away oil)", "-Pick up hearts to heal-"]
+    controls_text_string = ["-CONTROLS-", " ", "[WASD] to move", "[SPACE] to fire laser gun",
+                            "(hold to spam fire, can't destory oil)","[CLICK] to fire laser missile",
+                            "(blasts away everything)", "(limited ammo, obtained from missile crates)",
+                            "[HOLD SHIFT] for speed boost", " ", "-Destorying junk gives +1 score-",
+                            "-Blasting away oil gives +10 score-", "(Only laser missiles can blast away oil)",
+                            "-Pick up hearts to heal-"]
 
     while active:
         pos = pygame.mouse.get_pos()
@@ -256,7 +251,44 @@ def controls():
         pygame.display.update()
 
 
+def extra():
+    active = True
+    home_icon_piece = pygame.Rect(0, 0, HOME_ICON.get_width(), HOME_ICON.get_height())
 
+    facts_text_string = ["Octopus have 3 hearts", "The tongue of a blue whale is heavier than an elephant",
+                         "Crabs have taste buds on their feet",
+                         "The shockwave from a mantis shrimp punch vaporizes water upon contact",
+                         "After octopi mate they get dementia",
+                         "There are more than 3 million shipwrecks on the ocean floor",
+                         "The ancient sponge was the first animal",
+                         "Lobsters urinate in each other's faces as a way of communicating",
+                         "Seahorses are the only animal where the male gives birth"]
+
+    while active:
+        pos = pygame.mouse.get_pos()
+        home_icon = HOME_ICON
+
+        if home_icon_piece.collidepoint(pos):
+            home_icon = WHITE_HOME_ICON
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if home_icon_piece.collidepoint(pos):
+                    return
+
+        WIN.blit(OCEAN, (-600, 0))
+        WIN.blit(home_icon, (5, 0))
+        WIN.blit(PICTURE_FRAME, (WIDTH/2 - PICTURE_FRAME.get_width()/2, 30))
+
+        y_pos = 50 + PICTURE_FRAME.get_height()
+        for sentence in facts_text_string:
+            controls_text = WORD_FONT.render(sentence + "...", True, WHITE)
+            WIN.blit(controls_text, (WIDTH/2 - controls_text.get_width()/2, y_pos))
+            y_pos += controls_text.get_height()
+        pygame.display.update()
 
 
 def intro():
@@ -266,12 +298,7 @@ def intro():
     subtext = WORD_FONT.render("Singleplayer", True, BLUE)
     subtext2 = WORD_FONT.render("Exit", True, BLUE)
     frame = 0
-    op = -1
     while active:
-        #if frame < -100:
-          #  op = 1
-        #elif frame == 0:
-            #op = -1
         pos = pygame.mouse.get_pos()
         WIN.blit(OCEAN, (frame, 0))
         WIN.blit(TITLE, (WIDTH / 2 - TITLE.get_width() / 2, 70))
@@ -283,11 +310,11 @@ def intro():
         WIN.blit(thing, (510, 450))  # right small button
         WIN.blit(subtext, (WIDTH / 2 - subtext.get_width() / 2, 260))
 
-        # WIN.blit(WORD_FONT.render("Multiplayer", True, BLUE), (WIDTH/2 - subtext.get_width()/2, 330))
         WIN.blit(subtext2, (WIDTH / 2 - subtext2.get_width() / 2, 330))
 
-        WIN.blit(WORD_FONT.render("Info", True, BLUE), (575, 460))
-        WIN.blit(WORD_FONT.render("Controls", True, BLUE), (350, 460))
+        WIN.blit(WORD_FONT.render("Extra", True, BLUE), (570, 460))
+        WIN.blit(WORD_FONT.render("Controls", True, BLUE), (347, 460))
+        WIN.blit(WORD_FONT.render("Beta 1.0", True, WHITE), (10, HEIGHT - WORD_FONT.get_height()))
 
         play_button = pygame.Rect(WIDTH / 2 - BUTTON.get_width() / 2, 250, 400, 50)
         quit_button = pygame.Rect(WIDTH / 2 - BUTTON.get_width() / 2, 320, 400, 50)
@@ -295,7 +322,6 @@ def intro():
         button_1 = pygame.Rect(WIDTH / 2 - BUTTON.get_width() / 2, 450, 190, 50)
         button_2 = pygame.Rect(510, 450, 190, 50)
 
-        # pygame.draw.rect(WIN, WHITE, 190, 50)
         if play_button.collidepoint(pos):
             WIN.blit(LARGER_BUTTON, (WIDTH / 2 - LARGER_BUTTON.get_width() / 2, 250))
             WIN.blit(subtext, (WIDTH / 2 - subtext.get_width() / 2, 260))
@@ -304,11 +330,10 @@ def intro():
             WIN.blit(subtext2, (WIDTH / 2 - subtext2.get_width() / 2, 330))
         elif button_1.collidepoint(pos):
             WIN.blit(SMALLER_WHITE_BUTTON, (WIDTH / 2 - BUTTON.get_width() / 2, 450))
-            WIN.blit(WORD_FONT.render("Controls", True, BLUE), (350, 460))
+            WIN.blit(WORD_FONT.render("Controls", True, BLUE), (347, 460))
         elif button_2.collidepoint(pos):
             WIN.blit(pygame.transform.flip(SMALLER_WHITE_BUTTON, True, False), (510, 450))
-            WIN.blit(WORD_FONT.render("Info", True, BLUE), (575, 460))
-
+            WIN.blit(WORD_FONT.render("Extra", True, BLUE), (570, 460))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -317,16 +342,24 @@ def intro():
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     if play_button.collidepoint(pos):
+                        CLICK_SOUND.play()
+                        time.sleep(CLICK_SOUND.get_length())
                         active = False
                         INTRO_SONG.stop()
                         return
                     elif quit_button.collidepoint(pos):
+                        CLICK_SOUND.play()
+                        time.sleep(CLICK_SOUND.get_length())
                         pygame.quit()
                         sys.exit()
                     elif button_1.collidepoint(pos):
+                        CLICK_SOUND.play()
+                        time.sleep(CLICK_SOUND.get_length())
                         controls()
-        #frame += op * 1
-        #WIN.blit(HEART, (0,0))
+                    elif button_2.collidepoint(pos):
+                        CLICK_SOUND.play()
+                        time.sleep(CLICK_SOUND.get_length())
+                        extra()
         pygame.display.update()
 
 
@@ -334,24 +367,18 @@ def draw_window():
     global box
     global text
     WIN.blit(SEA, (0, 0))
-    # WIN.blit(ORB, (WIDTH/2 - ORB.get_width()/2, 200))
-    # name = WORD_FONT.render("NOVA", True, BLUE)
-    # WIN.blit(name, (WIDTH/2 - name.get_width()/2, 175))
-
     WIN.blit(box, (WIDTH / 2 - box.get_width() / 2, 560))
     print_text()
     WIN.blit(ORB, (50, 500))
-    # WIN.blit(OIL, (WIDTH/2 - OIL.get_width(), HEIGHT/2 - OIL.get_height()))
+    #name = SCORE_FONT.render("NOVA", True, WHITE)
+    #WIN.blit(name, (760, 515))
     pygame.display.update()
 
 
 def oil_dropping(drop):
     WIN.blit(SEA, (0, 0))
     WIN.blit(OIL, (drop.x, drop.y))
-    # time.sleep(1)
     pygame.display.update()
-
-BULLET_VEL = 15
 
 
 def fight():
@@ -363,7 +390,6 @@ def fight():
     trash_list = []
     dropped_hearts = []
     dropped_missiles = []
-    color = ""
     max_bullets = 999999
     max_missiles = 10
     frames = [BOSS_FRAME_0, BOSS_FRAME_1, BOSS_FRAME_2, BOSS_FRAME_3]
@@ -373,7 +399,8 @@ def fight():
     clock = pygame.time.Clock()
     active = True
     i = 0
-    pause_icon_piece = pygame.Rect(WIDTH - PAUSE_BLUE.get_width(), HEIGHT - PAUSE_BLUE.get_height() ,PAUSE_BLUE.get_width(), PAUSE_BLUE.get_height())
+    pause_icon_piece = pygame.Rect(WIDTH - PAUSE_BLUE.get_width(), HEIGHT - PAUSE_BLUE.get_height()
+                                   ,PAUSE_BLUE.get_width(), PAUSE_BLUE.get_height())
     piece = pygame.Rect((WIDTH//2 - frames[0].get_width()//2), 600, BOSS_WIDTH, BOSS_HEIGHT)
     bullets = []
     missiles = []
@@ -385,7 +412,6 @@ def fight():
         boss = frames[i]
         WIN.blit(SEA, (0, 0))
         pause_icon = PAUSE_BLUE
-
         keys_pressed = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -399,8 +425,8 @@ def fight():
                     pause_game()
                 elif event.button == 1 and max_missiles > 0:
                     LASER_SOUND.play()
-                    missile = pygame.Rect(piece.x + piece.width // 2 - MISSILE.get_width() // 2, piece.y - MISSILE.get_height() + 25, MISSILE.get_width(), MISSILE.get_height())
-                    #missile = pygame.Rect(0 , piece.y - MISSILE.get_height() + 25, WIDTH, MISSILE.get_height())
+                    missile = pygame.Rect(piece.x + piece.width // 2 - MISSILE.get_width() // 2, piece.y -
+                                          MISSILE.get_height() + 25, MISSILE.get_width(), MISSILE.get_height())
                     missiles.append(missile)
                     max_missiles -= 1
             if event.type == PLAYER_ADD_HEART and player_health < 6:
@@ -422,15 +448,13 @@ def fight():
                 while num > 0:
                     unpausing_text = SCORE_FONT.render(str(num), True, WHITE)
                     WIN.blit(SEA, (0, 0))
-                    WIN.blit(unpausing_text, (WIDTH/2 - unpausing_text.get_width()/2, HEIGHT/2 - unpausing_text.get_height()/2))
+                    WIN.blit(unpausing_text, (WIDTH/2 - unpausing_text.get_width()/2, HEIGHT/2 -
+                                              unpausing_text.get_height()/2))
                     pygame.display.update()
                     time.sleep(1)
                     num -= 1
-                # BULLET_HIT_SOUND.play()
-            #if event.type
         if keys_pressed[pygame.K_SPACE]:
             bullet = pygame.Rect(piece.x + piece.width // 2 - 4, piece.y - 5, 10, 3)
-            color = PINK
             bullets.append(bullet)
             bullet1 = pygame.Rect(piece.x + piece.width * 0.25, piece.y - 5, 3, 5)
             bullet2 = pygame.Rect(piece.x + piece.width * 0.75, piece.y - 5, 3, 5)
@@ -456,7 +480,6 @@ def fight():
             x_pos = random.randint(0, 900)
             dropped_heart = pygame.Rect(x_pos, 0, HEART.get_width(), HEART.get_height())
             dropped_hearts.append(dropped_heart)
-
         if drop_chance < 2:
             x_pos = random.randint(0, 900)
             dropped_missile = pygame.Rect(x_pos, 0, MISSILE_CRATE.get_width(), MISSILE_CRATE.get_height())
@@ -469,12 +492,9 @@ def fight():
             pygame.draw.rect(WIN, GREEN, bullet)
         for missile in missiles:
             WIN.blit(MISSILE, (missile.x, missile.y))
-            #pygame.draw.rect(WIN, PINK, missile)
         for drop in oil_drops:
-            # pygame.draw.rect(WIN, BLACK, drop)
             WIN.blit(OIL, (drop.x, drop.y))
         for trash in trash_list:
-            # pygame.draw.rect(WIN, BLACK, drop)
             WIN.blit(TRASH, (trash.x, trash.y))
         for dropped_heart in dropped_hearts:
             WIN.blit(HEART, (dropped_heart.x, dropped_heart.y))
@@ -485,26 +505,23 @@ def fight():
 
         score_points = SCORE_FONT.render(str(score),  True, WHITE)
         WIN.blit(score_points, (WIDTH - score_points.get_width(), 0))
-        hxpos = 0
+        hx_pos = 0
         for heart in range(player_health):
-            WIN.blit(HEART, (hxpos, 0))
-            hxpos += HEART.get_width()
-        hxpos = 0
+            WIN.blit(HEART, (hx_pos, 0))
+            hx_pos += HEART.get_width()
+        hx_pos = 0
         for icon in range(max_missiles):
-            WIN.blit(MISSILE_ICON, (hxpos, 30))
-            hxpos += MISSILE_ICON.get_width()
+            WIN.blit(MISSILE_ICON, (hx_pos, 30))
+            hx_pos += MISSILE_ICON.get_width()
 
         if pause_icon_piece.collidepoint(pos):
             pause_icon = PAUSE_YELLOW
         WIN.blit(pause_icon, (pause_icon_piece.x, pause_icon_piece.y))
         pygame.display.update()
         i += 1
-
     BOSS_SONG.stop()
     GAME_SONG.play(-1)
     return
-
-
 
 
 def handle_everything(bullets, missiles, oil_drops, trash_list, piece, dropped_hearts, dropped_missiles):
@@ -519,9 +536,8 @@ def handle_everything(bullets, missiles, oil_drops, trash_list, piece, dropped_h
         if bullet.x < 0:
             bullets.remove(bullet)
 
-
     for missile in missiles:
-        missile.y -= 15
+        missile.y -= 20
         for trash in trash_list:
             if trash.colliderect(missile):
                 trash_list.remove(trash)
@@ -530,7 +546,6 @@ def handle_everything(bullets, missiles, oil_drops, trash_list, piece, dropped_h
             if oil.colliderect(missile):
                 oil_drops.remove(oil)
                 score += 10
-
 
     for drop in oil_drops:
         drop.y += 10
@@ -578,6 +593,7 @@ def handle_movement(keys_pressed, piece, vel):
     if keys_pressed[pygame.K_s] and piece.y + vel + piece.height < HEIGHT:  # DOWN
         piece.y += vel
 
+
 def pause_game():
     active = True
     BOSS_SONG.set_volume(0)
@@ -586,8 +602,8 @@ def pause_game():
     while active:
         pos = pygame.mouse.get_pos()
         WIN.blit(SEA, (0, 0))
-        unpause_text = pygame.Rect(WIDTH /2 - unpause.get_width() /2, HEIGHT /2 - unpause.get_height() /2, unpause.get_width(), unpause.get_height())
-        pos = pygame.mouse.get_pos()
+        unpause_text = pygame.Rect(WIDTH /2 - unpause.get_width() / 2, HEIGHT / 2 - unpause.get_height() / 2,
+                                   unpause.get_width(), unpause.get_height())
         WIN.blit(unpause, (unpause_text.x, unpause_text.y))
         if unpause_text.collidepoint(pos):
             unpause = UNPAUSED_WHITE
@@ -596,10 +612,8 @@ def pause_game():
 
         home_icon = HOME_ICON
 
-
         if home_icon_piece.collidepoint(pos):
             home_icon = WHITE_HOME_ICON
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -607,12 +621,11 @@ def pause_game():
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    paused = False
+                    active = False
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     if unpause_text.collidepoint(pos):
                         active = False
-
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if home_icon_piece.collidepoint(pos):
@@ -623,6 +636,7 @@ def pause_game():
     BOSS_SONG.set_volume(0.3)
     pygame.event.post(pygame.event.Event(UNPAUSING))
     return
+
 
 def main():
     intro()
@@ -657,13 +671,13 @@ def main():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if (event.key == pygame.K_RETURN or event.key == pygame.K_SPACE):
+                if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
                     update_text()
-                if event.key == pygame.K_b:
-                    pygame.event.post(pygame.event.Event(OIL_EVENT))
-                if event.key == pygame.K_v:
-                    fight()
-            elif (event.type == pygame.MOUSEBUTTONUP):
+                #if event.key == pygame.K_b:
+                    #pygame.event.post(pygame.event.Event(OIL_EVENT))
+                #if event.key == pygame.K_v:
+                    #fight()
+            elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     update_text()
         draw_window()
@@ -671,6 +685,4 @@ def main():
     sys.exit()
 
 
-
-if __name__ == "__main__":
-    main()
+main()
